@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect
 from Seller.views import set_pwd
 from Seller.models import *
+from Buyer.models import *
 
 
 def loginValid(fun):  # 登录校验
@@ -68,6 +69,17 @@ def login(request):  # 注册
 
 @loginValid
 def index(request):
+    email = request.COOKIES.get('email')
+    if email:
+        user = User.objects.get(email=email)
+    gts = GoodsType.objects.all()
+    data = {}
+    for gt in gts:
+        datas = gt.goods_set.all()
+        if len(datas) >= 4:
+            datas = datas[0:4]
+            data.setdefault(gt, datas)
     return render(request, 'buyer/index.html', locals())
+
 
 # Create your views here.
