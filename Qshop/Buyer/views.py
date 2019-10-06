@@ -3,6 +3,19 @@ from Seller.views import set_pwd
 from Seller.models import *
 
 
+def loginValid(fun):  # 登录校验
+    def inner(request, *args, **kwargs):
+        email = request.COOKIES.get('email')
+        id = request.COOKIES.get('user_id')
+        se_email = request.session.get('email')
+        if email and se_email and email == se_email:
+            return fun(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect('/Buyer/login/')
+
+    return inner
+
+
 def register(request):  # 注册
     err_msg = ''
     if request.method == 'POST':
@@ -53,6 +66,7 @@ def login(request):  # 注册
     return render(request, 'buyer/login.html', locals())
 
 
+@loginValid
 def index(request):
     return render(request, 'buyer/index.html', locals())
 
