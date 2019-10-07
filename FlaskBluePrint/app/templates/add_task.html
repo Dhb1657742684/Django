@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method="post">
+        {% for t in task %}
+            <p>{{ t }}</p>
+        {% endfor %}
+        <input type="submit" class="btn btn-danger btn-block" value="提交">
+        {% for err in errors.values() %}
+            <p style="text-align: center;color: #f00;">{{ err.0 }}</p>
+        {% endfor %}
+    </form>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    请假条
+{% endblock %}
+
+{% block label %}
+    请假条
+{% endblock %}
+
+{% block btn %}
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+{#        <input type="hidden" value="{{ csrf_token() }}" name="csrf_token">#}
+        <table class="table">
+            <tr>
+                <th>请假人姓名</th>
+                <td>
+                    <input type="text" name="leave_name" class="form-control form-control-user" placeholder="请假人姓名">
+                </td>
+                <th>假期类型</th>
+                <td>
+                    <select name="leave_type" class="form-control form-control-user">
+                        <option value="事假">事假</option>
+                        <option value="病假">病假</option>
+                        <option value="婚假">婚假</option>
+                        <option value="产假">产假</option>
+                        <option value="年假">年假</option>
+                        <option value="缺勤">缺勤</option>
+                        <option value="加班">加班</option>
+                        <option value="调休">调休</option>
+                        <option value="出差">出差</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>起始时间</th>
+                <td>
+                    <input type="date" name="leave_start" class="form-control form-control-user">
+                </td>
+                <th>结束时间</th>
+                <td>
+                    <input type="date" name="leave_end" class="form-control form-control-user">
+                </td>
+            </tr>
+            <tr>
+                <th>联系方式</th>
+                <td>
+                    <input type="text" name="leave_phone" class="form-control form-control-user" placeholder="请输入联系方式">
+                </td>
+                <th>请假天数</th>
+                <td>
+                    <input type="text" class="form-control form-control-user" placeholder="请输入时间">
+                </td>
+            </tr>
+            <tr>
+                <th>请假描述</th>
+                <td colspan="3">
+                    <textarea name="leave_desc" class="form-control form-control-user"
+                              style="resize: none;height: 40px;"></textarea>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" class="btn btn-primary" value="提交" style="width: 100%;">
+        <p style="text-align: center; margin-top: 10px; color: red;font-size: 18px">{{ err_msg }}</p>
+    </form>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    个人中心
+{% endblock %}
+
+{% block label %}
+    个人中心
+{% endblock %}
+
+{% block btn %}
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">个人信息</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="datasTable" width="100%" cellspacing="0">
+                    <tr>
+                        <td rowspan="3"><img src="/static/img/tx.jpg" alt="" width="300px" height="300px"></td>
+                        <td>昵称：哈哈哈哈</td>
+                        <td>年龄：18</td>
+                    </tr>
+                    <tr>
+                        <td>性别：男</td>
+                        <td>电话：12345677890</td>
+                    </tr>
+                    <tr>
+                        <td>邮箱：123456@qq.com</td>
+                        <td>住址：北京市朝阳区35号</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">课程表</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0"
+                       style="text-align: center;">
+                    <thead>
+                    <tr>
+                        <th>周一</th>
+                        <th>周二</th>
+                        <th>周三</th>
+                        <th>周四</th>
+                        <th>周五</th>
+                        <th>周六</th>
+                        <th>周日</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for data in datas %}
+                        <tr>
+                            {% for d in data %}
+                                {% if d =='empty' %}
+                                    <td>{{ d }}</td>
+                                {% else %}
+                                    {% for key,value in d.items() %}
+                                        {% if key<day %}
+                                            <td style="background-color: grey;color: white;">{{ key }}--{{ value }}</td>
+                                        {% endif %}
+                                        {% if key==day %}
+                                            <td style="background-color: greenyellow;color: yellowgreen;">{{ key }}--{{ value }}</td>
+                                        {% endif %}
+                                        {% if key>day %}
+                                            <td>{{ key }}--{{ value }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+
