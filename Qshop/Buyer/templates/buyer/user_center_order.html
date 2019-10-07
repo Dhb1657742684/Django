@@ -9,8 +9,8 @@
 		<div class="left_menu_con clearfix">
 			<h3>用户中心</h3>
 			<ul>
-				<li><a href="/ForeGround/user_info/">· 个人信息</a></li>
-				<li><a href="/ForeGround/user_center_order/" class="active">· 全部订单</a></li>
+				<li><a href="/Buyer/user_info/">· 个人信息</a></li>
+				<li><a href="/Buyer/user_center_order/" class="active">· 全部订单</a></li>
 				<li><a href="user_center_site.html">· 收货地址</a></li>
 			</ul>
 		</div>
@@ -47,7 +47,7 @@
 							<td width="55%">
                                 {% for data in order.orderinfo_set.all %}
                                 <ul class="order_goods_list clearfix">
-									<li class="col01"><img src="/static/foreground/{{ data.goods_photo }}"></li>
+									<li class="col01"><img src="/static/buyer/{{ data.goods_photo }}"></li>
 									<li class="col02">{{ data.goods_name }}<em>{{ data.goods_price }}元/500g</em></li>
 									<li class="col03">{{ data.goods_count }}</li>
 									<li class="col04">{{ data.goods_total }}元</li>

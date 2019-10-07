@@ -42,8 +42,8 @@
                 <ul class="goods_list fl">
                     {% for d in value %}
                         <li>
-                            <h4><a href="/buyer/detail/{{ d.id }}/">{{ d.goods_num }}</a></h4>
-                            <a href="/buyer/detail/{{ d.id }}/"><img src="/static/buyer/{{ d.goods_photo }}"></a>
+                            <h4><a href="/Buyer/detail/{{ d.id }}/">{{ d.goods_num }}</a></h4>
+                            <a href="/Buyer/detail/{{ d.id }}/"><img src="/static/buyer/{{ d.goods_photo }}"></a>
                             <div class="prize">¥ {{ d.goods_price }}</div>
                         </li>
                     {% endfor %}

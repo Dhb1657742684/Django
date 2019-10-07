@@ -1,8 +1,12 @@
 import hashlib
 import random
+import time
+import datetime
 from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from Seller.models import *
 from Buyer.models import *
+from alipay import AliPay
+from django.http import JsonResponse
 from django.core.paginator import Paginator
 
 
@@ -17,6 +21,24 @@ def back_page(pages, current_page):  # pages 总页数  step 当前页数
             return [pages - 4, pages - 3, pages - 2, pages - 1, pages]
         else:
             return [current_page - 2, current_page - 1, current_page, current_page + 1, current_page + 2]
+
+
+def loginVaild(fun):
+    def inner(request, *args, **kwargs):
+        coo_email = request.COOKIES.get('email')
+        sess_email = request.session.get('email')
+        if coo_email and sess_email:
+            return fun(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect('/ForeGround/login/')
+
+    return inner
+
+
+def detail(request, id):
+    id = int(id)
+    goods = Goods.objects.filter(id=id).first()
+    return render(request, 'buyer/detail.html', locals())
 
 
 # 密码加密
@@ -90,6 +112,16 @@ def login(request):  # 注册
     return render(request, 'buyer/login.html', locals())
 
 
+# 退出
+def loginout(request):
+    response = HttpResponseRedirect('/ForeGround/index/')  # 回到登录页
+    cookies = request.COOKIES.keys()
+    for key in cookies:  # 删除cookie和session
+        response.delete_cookie(key)
+    del request.session['email']
+    return response
+
+
 @loginValid
 def index(request):
     email = request.COOKIES.get('email')
@@ -150,4 +182,122 @@ def goods_list(request, page):
     else:
         recomm_goods = Goods.objects.order_by('-goods_price_data')[:2]
     return render(request, 'buyer/goods_list.html', locals())
+
+
+# 支付宝支付
+from Qshop.settings import alipay_public_key_string, alipay_private_key_string
+
+
+def pay(request):
+    order_num = request.GET.get('order_num')
+    order = PayOrder.objects.get(order_num=order_num)
+    alipay = AliPay(
+        appid='2016101200667717',
+        app_notify_url=None,
+        app_private_key_string=alipay_private_key_string,
+        alipay_public_key_string=alipay_public_key_string,
+        sign_type='RSA2'
+    )
+
+    order_string = alipay.api_alipay_trade_page_pay(
+        out_trade_no=order_num,
+        total_amount=str(order.order_total),
+        subject='生鲜交易',
+        return_url='http://127.0.0.1:8000/ForeGround/order_result/',
+        notify_url='http://127.0.0.1:8000/ForeGround/order_result/'
+    )
+    result = 'https://openapi.alipaydev.com/gateway.do?' + order_string
+    return HttpResponseRedirect(result)
+
+
+# 支付结果
+def order_result(request):
+    order_num = request.GET.get('out_trade_no')
+    order = PayOrder.objects.get(order_num=order_num)
+    order.order_status = 1
+    order.orderinfo_set.all().update(goods_status=1)
+    order.save()
+    return render(request, 'buyer/order_result.html')
+
+
+# 加入购物车
+@loginVaild
+def add_cart(request):
+    result = {
+        'code': 200,
+        'data': ''
+    }
+    if request.method == 'POST':
+        id = int(request.POST.get('goods_id'))
+        count = int(request.POST.get('count', 1))
+        goods = Goods.objects.get(id=id)
+        cart = Cart()
+        cart.goods_name = goods.goods_num
+        cart.goods_num = count
+        cart.goods_price = goods.goods_price
+        cart.goods_photo = goods.goods_photo
+        cart.goods_total = round(goods.goods_price * count, 2)
+        cart.goods_id = id
+        cart.cart_user = request.COOKIES.get('user_id')
+        cart.save()
+        result['data'] = '加入成功'
+    else:
+        result['code'] = 500
+        result['data'] = '请求方式错误'
+    return JsonResponse(result)
+
+
+# 购物车
+@loginVaild
+def shop_cart(request):
+    user_id = request.COOKIES.get('user_id')
+    total = 0
+    goods = Cart.objects.filter(cart_user=int(user_id)).order_by('-id')
+    for good in goods:
+        total += good.goods_total
+    count = goods.count()
+    return render(request, 'buyer/shop_cart.html', locals())
+
+
+@loginVaild
+def pay_order(request):
+    datas = request.GET
+    d = []
+    goods_id = request.GET.getlist('goods_id')
+    goods_count = request.GET.getlist('count')
+    n = len(goods_id)
+    for i in range(n):
+        d.append((goods_id[i], goods_count[i]))
+    if goods_id and goods_count:
+        order = PayOrder()  # 实例化订单
+        order.order_num = str(time.time()).replace('.', '')  # 订单编号
+        order.order_date = datetime.datetime.now()  # 订单时间
+        order.order_status = 0  # 订单状态
+        id = int(request.COOKIES.get('user_id'))
+        order.order_user = User.objects.get(id=id)  # 订单用户
+        order.save()
+        total = 0
+        for i in d:
+            goods = Goods.objects.get(id=int(i[0]))
+            order_info = OrderInfo()
+            order_info.order_id = order
+            order_info.goods_id = i[0]
+            order_info.goods_photo = goods.goods_photo
+            order_info.goods_name = goods.goods_num
+            order_info.goods_count = int(i[1])
+            order_info.goods_price = goods.goods_price
+            order_info.goods_total = goods.goods_price * int(i[1])
+            order_info.goods_status = 0
+            total += goods.goods_price * int(i[1])
+            order_info.store_id = goods.goods_user
+            order_info.save()
+        order.order_total = total
+        order.save()
+    return render(request, 'buyer/pay_order.html', locals())
+
+
+def user_center_order(request):
+    id = request.COOKIES.get('user_id')
+    orders = PayOrder.objects.filter(order_user=id).order_by('-order_date')
+    return render(request, 'buyer/user_center_order.html', locals())
 # Create your views here.

@@ -168,4 +168,51 @@ def order_list(request, status, page=1):  # 订单列表
     store = User.objects.get(email=email)  # 获取店铺信息
     orders = store.orderinfo_set.filter(goods_status=status).order_by("-id")  # 获取店铺对应的订单
     return render(request, 'seller/order_list.html', locals())
+
+
+def goods_add(request):
+    email = request.COOKIES.get('email')
+    user = User.objects.filter(email=email).first()
+    goods_type = GoodsType.objects.all()
+    if request.method == 'POST':
+        cook = request.COOKIES.get('email')
+        user = User.objects.get(email=email)
+        goods = Goods()
+        goods.goods_num = request.POST.get('goods_num')
+        goods.goods_name = request.POST.get('goods_name')
+        goods.goods_price = request.POST.get('goods_price')
+        goods.goods_price_data = request.POST.get('goods_price_data')
+        goods.goods_inven = request.POST.get('goods_inven')
+        goods.goods_area = request.POST.get('goods_area')
+        goods.goods_expr = request.POST.get('goods_expr')
+        goods.goods_type = GoodsType.objects.get(type_label=request.POST.get('goods_type'))
+        goods.goods_user = user
+        goods.goods_photo = request.FILES.get('goods_photo')
+        goods.goods_status = 1
+        goods.save()
+    return render(request, 'seller/goods_add.html', locals())
+
+
+def change_status(request, st, id):  # 更改商品的状态
+    id = int(id)
+    goods = Goods.objects.filter(id=id).first()
+    if st == 'up':
+        goods.goods_status = 1
+    elif st == 'down':
+        goods.goods_status = 0
+    else:
+        pass
+    goods.save()
+    url = request.META.get('HTTP_REFERER', '/goods_list/1/1/')
+    return HttpResponseRedirect(url)
+
+
+# 发货
+def change_order_goods_status(request, oid):  # 更改订单商品的状态
+    oid = int(oid)
+    order = OrderInfo.objects.filter(id=oid).first()
+    order.goods_status = 2
+    order.save()
+    url = request.META.get('HTTP_REFERER', '/order_list/1/')
+    return HttpResponseRedirect(url)
 # Create your views here.

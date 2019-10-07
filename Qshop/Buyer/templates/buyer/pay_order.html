@@ -44,7 +44,7 @@
         {% for g in order.orderinfo_set.all %}
             <ul class="goods_list_td clearfix">
 			<li class="col01">1</li>
-			<li class="col02"><img src="/static/foreground/{{ g.goods_photo }}"></li>
+			<li class="col02"><img src="/static/buyer/{{ g.goods_photo }}"></li>
 			<li class="col03">{{ g.goods_name }}</li>
 			<li class="col04">500g</li>
 			<li class="col05">{{ g.goods_price }}元</li>
@@ -65,7 +65,7 @@
 	</div>
 
 	<div class="order_submit clearfix">
-		<a href="/ForeGround/pay/?order_num={{ order.order_num }}" id="order_btn">提交订单</a>
+		<a href="/Buyer/pay/?order_num={{ order.order_num }}" id="order_btn">提交订单</a>
 	</div>	
 
 {% endblock %}
