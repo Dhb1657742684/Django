@@ -1,0 +1,46 @@
+{% extends 'seller/base.html' %}
+
+{% block label %}
+    增加商品
+{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_name" placeholder="商品编号">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_num" placeholder="商品名称">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_price" placeholder="商品价格">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_price_data" placeholder="生产日期">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_inven" placeholder="库存">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_area" placeholder="生产地">
+        </div>
+        <div class="form-group">
+            <input class="form-control form-control-user" type="text" name="goods_expr" placeholder="保质期">
+        </div>
+        <div class="form-group">
+            <select class="form-control form-control-user" name="goods_type">
+                {% for gt in goods_type %}
+                    <option value="{{ gt.type_label }}">{{ gt.type_label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="file" name="goods_photo" placeholder="图片">
+        </div>
+        <div class="form-group">
+            <input class="btn btn-block btn-primary" type="submit">
+        </div>
+    </form>
+{% endblock %}
+

@@ -1,0 +1,145 @@
+{% extends 'buyer/base.html' %}
+
+{% block title %}
+购物车
+{% endblock %}
+
+{% block content %}
+    <div class="total_count">全部商品<em>{{ count }}</em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+    <form action="/ForeGround/pay_order/">
+	{% for good in goods %}
+        <ul class="cart_list_td clearfix">
+		    <li class="col01"><input type="checkbox" class="check"></li>
+		    <li class="col02"><img src="/static/foreground/{{ good.goods_photo }}"></li>
+		    <li class="col03">{{ good.goods_name }}<br><em>{{ good.goods_price }}元/500g</em></li>
+            <input type="hidden" value="{{ good.goods_id }}" name="goods_id">
+		    <li class="col04">500g</li>
+		    <li class="col05"><em class="price">{{ good.goods_price }}</em>元</li>
+            <li class="col06">
+                <div class="num_add">
+                    <a href="javascript:;" class="add fl">+</a>
+                    <input type="text" class="num_show fl" value="{{ good.goods_num }}" id="num" name="count">
+                    <a href="javascript:;" class="minus fl">-</a>
+                </div>
+            </li>
+		    <li class="col07"><em class="total">{{ good.goods_total }}</em>元</li>
+		    <li class="col08"><a href="javascript:;">删除</a></li>
+	    </ul>
+	{% endfor %}
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" id="all_box"></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em id="total"></em><br>共计<b>{{ count }}</b>件商品</li>
+		<li class="col04"><input type="submit" value="去结算"></li>
+	</ul>
+    </form>
+{% endblock %}
+
+{% block script %}
+    <script>
+        function get_total() {
+            var elements = document.getElementsByClassName('total');
+            var to_ele = document.getElementById('total');
+            var total = 0;
+            for (var i=0;i<elements.length;i++) {
+                t = elements[i].innerText;
+                total += parseFloat(t);
+            }
+            to_ele.innerText = total.toFixed(2);
+        }
+        get_total();
+        $('.num_show').each(
+            function () {
+                $(this).blur(
+                    function () {
+                        var price_ele = $(this).parent().parent().parent().children('.col05').children('em').first();
+                        var price = price_ele.text();
+                        var num_ele = $(this).parent().children('input').first();
+                        var num = parseInt(num_ele.val());
+                        var total_ele = $(this).parent().parent().parent().children('.col07').children('em').first();
+                        if (num<=1) {
+                            num = 1;
+                            num_ele.val(num);
+                        }
+                        total_ele.text((parseFloat(price) * num).toFixed(2));
+                        get_total();
+                    }
+                )
+            }
+        );
+        $('.add').each(
+            function () {
+                $(this).click(
+                    function () {
+                        var price_ele = $(this).parent().parent().parent().children('.col05').children('em').first();
+                        var price = price_ele.text();
+                        var num_ele = $(this).parent().children('input').first();
+                        var num = parseInt(num_ele.val());
+                        var total_ele = $(this).parent().parent().parent().children('.col07').children('em').first();
+                        num = parseInt(num) +1;
+                        num_ele.val(num);
+                        total_ele.text((parseFloat(price) * num).toFixed(2));
+                        get_total();
+                    }
+                )
+            }
+        );
+        $('.minus').each(
+            function () {
+                $(this).click(
+                    function () {
+                        var price_ele = $(this).parent().parent().parent().children('.col05').children('em').first();
+                        var price = price_ele.text();
+                        var num_ele = $(this).parent().children('input').first();
+                        var num = parseInt(num_ele.val());
+                        var total_ele = $(this).parent().parent().parent().children('.col07').children('em').first();
+                        if (num<=1){
+                            num = 1;
+                        }else {
+                            num = num - 1;
+                        }
+                        num_ele.val(num);
+                        total_ele.text((parseFloat(price) * num).toFixed(2));
+                        get_total();
+                    }
+                )
+            }
+        );
+        $('#buy_now').click(
+            function () {
+                var url = '/ForeGround/pay_order/?goods_id={{ goods.id }}&count='+ $('#num').val();
+                window.location.href = url;
+            }
+        );
+        $('#all_box').click(
+            function () {
+                if (this.checked){
+                    $('.check').prop('checked',true)
+                } else {
+                    $('.check').prop('checked',false)
+                }
+            }
+        );
+        $('.check').each(
+            function () {
+                $(this).click(
+                    function () {
+                        if (! this.checked) {
+                            $('#all_box').prop('checked',false)
+                        }
+                    }
+                )
+            }
+        );
+    </script>
+{% endblock %}
+

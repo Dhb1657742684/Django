@@ -1,11 +1,11 @@
 from django.db import models
-from Seller.views import User
+from Seller.models import User
 
 
 class GoodsType(models.Model):
     type_label = models.CharField(max_length=32)
     type_desc = models.TextField()
-    type_photo = models.ImageField(upload_to='foreground/images', default='images/banner01.jpg')
+    type_photo = models.ImageField(upload_to='buyer/images', default='images/banner01.jpg')
 
 
 class Goods(models.Model):
@@ -17,7 +17,7 @@ class Goods(models.Model):
     goods_area = models.CharField(max_length=32, null=True, blank=True)  # 产地
     goods_expr = models.IntegerField(null=True, blank=True)  # 保质期
     goods_status = models.IntegerField(default=1)  # 状态 0为下架商品 1为在售商品
-    goods_photo = models.ImageField(upload_to='foreground/image', default='image/defaule_img.jpg')
+    goods_photo = models.ImageField(upload_to='buyer/image', default='image/defaule_img.jpg')
     goods_user = models.ForeignKey(to=User, on_delete=models.CASCADE, default=1)
     goods_type = models.ForeignKey(to=GoodsType, on_delete=models.CASCADE, default=1)
 

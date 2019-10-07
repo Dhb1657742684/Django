@@ -1,0 +1,95 @@
+{% extends 'buyer/base.html' %}
+
+{% block title %}
+商品列表
+{% endblock %}
+
+{% block content %}
+
+        <div class="breadcrumb">
+            <a href="#">全部分类</a>
+            <span>></span>
+            <a href="#">新鲜水果</a>
+        </div>
+
+        <div class="main_wrap clearfix">
+            <div class="l_wrap fl clearfix">
+                <div class="new_goods">
+                    <h3>新品推荐</h3>
+                    <ul>
+                        {% for goods in recomm_goods %}
+                            <li>
+                                <a href="/Buyer/detail/{{ goods.id }}/"><img src="/static/buyer/{{ goods.goods_photo }}"></a>
+                                <h4><a href="/Buyer/detail/{{ goods.id }}/">{{ goods.goods_num }}</a></h4>
+                                <div class="prize">￥{{ goods.goods_price }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+{% if goods_lst %}
+            <div class="r_wrap fr clearfix">
+                <div class="sort_bar">
+                    <a href="#" class="active">默认</a>
+                    <a href="#">价格</a>
+                    <a href="#">人气</a>
+                </div>
+
+                <ul class="goods_type_list clearfix">
+                    {% for goods in goods_list %}
+                        <li>
+                            <a href="/Buyer/detail/{{ goods.id }}/"><img src="/static/buyer/{{ goods.goods_photo }}"></a>
+                            <h4><a href="/Buyer/detail/{{ goods.id }}/">{{ goods.goods_num }}</a></h4>
+                            <div class="operate">
+                                <span class="prize">￥{{ goods.goods_price }}</span>
+                                <span class="unit">{{ goods.goods_price }}/500g</span>
+                                <a href='#' class="add_goods" id={{ goods.id }} title="加入购物车" onclick="add_cart(this)"></a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="pagenation">
+                    <a href="/Buyer/goods_list/{{ b_p }}/?type={{ gt.type_label }}">
+                        &lt;上一页
+                    </a>
+                    {% for page in bp %}
+                        <a href="/Buyer/goods_list/{{ page }}/?type={{ gt.type_label }}">{{ page }}</a>
+                    {% endfor %}
+                    <a href="/Buyer/goods_list/{{ a_p }}/?type={{ gt.type_label }}">下一页&gt;</a>
+                </div>
+            </div>
+        </div>
+{% else %}
+        <p style="text-align: center;font-size: 30px;height: 250px;">
+        对不起，小店没有您找的物品
+        </p>
+{% endif %}
+
+{% block script %}
+    <script>
+    function add_cart(obj) {
+        var goods_id = obj.id;
+        var csrf_token = '{{ csrf_token }}';
+        var senddata = {
+            'goods_id':goods_id,
+            'csrfmiddlewaretoken':csrf_token
+        };
+        $.ajax(
+            {
+                url:'/ForeGround/add_cart/',
+                type:'POST',
+                data:senddata,
+                success:function (data) {
+                    console.log(data)
+                },
+                error:function (error) {
+                    console.log(error)
+                }
+            }
+        )
+    }
+    </script>
+{% endblock %}
+
+{% endblock %}

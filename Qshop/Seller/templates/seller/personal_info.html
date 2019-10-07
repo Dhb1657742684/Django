@@ -1,0 +1,37 @@
+{% extends 'seller/base.html' %}
+{% block label %}
+    完善个人信息
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table class="table">
+            <tr>
+                <td colspan="1" rowspan="2">
+                    <img src="/static/{{ user.photo }}/" alt="" width="300px" height="300px">
+                </td>
+                <td>用户名：<input type="text" placeholder="{{ user.username }}" name="username"></td>
+                <td>年龄：<input type="text" placeholder="{{ user.age }}" name="age"></td>
+            </tr>
+            <tr>
+
+                <td>性别：<input type="text" placeholder="{{ user.sex }}" name="sex"></td>
+                <td>电话：<input type="text" placeholder="{{ user.pho_num }}" name="phone"></td>
+
+            </tr>
+            <tr>
+                <td><input type="file" name="img"></td>
+                <td>邮箱：<input type="text" placeholder="{{ user.email }}" name="email"></td>
+                <td>住址：<input type="text" placeholder="{{ user.address }}" name="address"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input class="btn btn-info" type="submit" value="更改信息"></td>
+                <td></td>
+            </tr>
+        </table>
+        <p style="height: 30px; line-height: 30px; text-align: center; color: red;">{{ data.data }}</p>
+    </form>
+{% endblock %}
+

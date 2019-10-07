@@ -1,10 +1,13 @@
 import time
 import datetime
 import random
+from Buyer.views import back_page
 from django.shortcuts import render, HttpResponseRedirect
 from Seller.models import *
+from Buyer.models import *
 import hashlib
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -134,4 +137,35 @@ def loginout(request):  # 退出登录
 @loginValid
 def index(request):
     return render(request, 'seller/index.html')
+
+
+@loginValid
+def goods_list(request, status, page=1):
+    email = request.COOKIES.get('email')
+    user = User.objects.filter(email=email).first()
+    static = int(status)
+    page = int(page)
+    next_page = page + 1
+    page_size = 10
+    if static == 1:
+        good_lst = Goods.objects.filter(goods_status=1)
+    elif static == 0:
+        good_lst = Goods.objects.filter(goods_status=0)
+    else:
+        good_lst = Goods.objects.all()
+    gd_list = Paginator(good_lst, page_size)  # 进行分页
+    goods = gd_list.page(page)  # 返回对应页的数据
+    pages = gd_list.num_pages  # 获取总页数
+    bapa = back_page(pages, page)
+    return render(request, 'seller/goods_list.html', locals())
+
+
+@loginValid
+def order_list(request, status, page=1):  # 订单列表
+    status = int(status)
+    page = int(page)
+    email = request.COOKIES.get('email')
+    store = User.objects.get(email=email)  # 获取店铺信息
+    orders = store.orderinfo_set.filter(goods_status=status).order_by("-id")  # 获取店铺对应的订单
+    return render(request, 'seller/order_list.html', locals())
 # Create your views here.
